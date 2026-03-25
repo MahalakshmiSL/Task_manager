@@ -16,9 +16,13 @@ const app = express();
 
 // middleware
 app.use("/api/logs", logRoutes);
+
+
 app.use(
   cors({
-    origin: "*",
+    origin: "*", // allow all origins
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
   })
 );
 app.use(express.json());
