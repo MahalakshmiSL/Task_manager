@@ -2,39 +2,39 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
+
 import authRoutes from "./routes/authRoutes.js";
-import authMiddleware from "./middleware/authMiddleware.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import logRoutes from "./routes/logRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
-
+import authMiddleware from "./middleware/authMiddleware.js";
 
 dotenv.config();
 
-// ✅ FIRST create app
 const app = express();
 
-// middleware
-app.use("/api/logs", logRoutes);
-
-
+// ✅ 1. CORS FIRST (VERY IMPORTANT)
 app.use(
   cors({
-    origin: "*", // allow all origins
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// ✅ 2. JSON middleware
 app.use(express.json());
-app.use("/api/tasks", taskRoutes);
-// DB connection
-app.use("/api/users", userRoutes);
+
+// ✅ 3. Connect DB
 connectDB();
 
-// routes
+// ✅ 4. Routes (AFTER CORS)
 app.use("/api/auth", authRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/logs", logRoutes);
+app.use("/api/users", userRoutes);
 
-// ✅ Protected route (AFTER app is created)
+// ✅ Protected test route
 app.get("/api/test", authMiddleware, (req, res) => {
   res.json({
     msg: "Protected route working",
@@ -42,7 +42,7 @@ app.get("/api/test", authMiddleware, (req, res) => {
   });
 });
 
-// test route
+// root route
 app.get("/", (req, res) => {
   res.send("API Running 🚀");
 });
